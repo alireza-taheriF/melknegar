@@ -12,8 +12,8 @@ def trans(path):
     img = Image.fromarray(out, 'RGBA')
     bbox = img.getchannel('A').point(lambda v: 255 if v>20 else 0).getbbox()
     return img.crop(bbox)
-mark = trans('/mnt/user-data/uploads/c791124f-image.jpg')
-word = trans('/mnt/user-data/uploads/c23973ef-image.jpg')
+mark = trans('/mnt/user-data/uploads/2e9b6728-image.webp')
+word = trans('/mnt/user-data/uploads/76e21784-image.webp')
 def fit(img, h):
     w = round(img.width*h/img.height); return img.resize((w,h), Image.LANCZOS)
 fit(mark, 256).save('public/img/mark.png', optimize=True)
