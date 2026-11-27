@@ -534,3 +534,8 @@ select.input { appearance: none; background-image: url("data:image/svg+xml,%3Csv
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
 }
+
+/* clickable cards rendered as <button> */
+button.card, button.list, button.prow, button.match { border: 0; font: inherit; color: inherit; text-align: start; display: block; width: 100%; cursor: pointer; }
+button.card.service-card, button.prow, button.match { display: flex; }
+button.card:hover { background: var(--surface-2); }

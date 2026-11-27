@@ -1,7 +1,7 @@
 // Service worker: caches the app shell only. API responses (private data) are never cached.
 // Static files: served instantly from cache, refreshed in the background
 // (stale-while-revalidate). Pages: network first with a short timeout.
-const VERSION = 'pn-v5';
+const VERSION = 'pn-v6';
 const SHELL = ['/', '/index.html', '/css/app.css', '/js/theme.js', '/js/app.js', '/js/core.js', '/js/labels.js',
   '/js/views/auth.js', '/js/views/home.js', '/js/views/properties.js', '/js/views/clients.js', '/js/views/capture.js',
   '/js/views/services.js', '/js/views/settings.js', '/js/views/admin.js', '/js/views/public.js',
