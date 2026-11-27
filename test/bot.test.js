@@ -157,6 +157,20 @@ test('bot: link, menu, capture, card actions, edit, search, lists', async () => 
   assert.match(calls.find((x) => x.method === 'answerCallbackQuery').body.text, /وصل نیست/);
   assert.ok(!calls.some((x) => x.method === 'editMessageText'));
 
+  // New order -> admin is notified with status buttons, and can move it forward
+  const { mutatePlatform } = await import('../lib/data.js');
+  const order = { id: 'o_test123', code: 'MN-1001', kind: 'content', package: 'reels', estimate: 3200000, agency: 'املاک تست', source: 'app', status: 'new', contact: { name: 'کریمی', phone: '09121112233' }, location: { city: 'مشهد', neighborhood: 'الهیه', address: 'الهیه ۱۲' }, details: { area: 120, preferredAt: 'شنبه صبح' }, history: [] };
+  await mutatePlatform((p) => { p.orders[order.id] = order; });
+  calls.length = 0;
+  await bots.notifyNewOrder(order);
+  const note = calls.find((x) => x.method === 'sendMessage');
+  assert.equal(note.body.chat_id, String(CHAT));
+  assert.match(note.body.text, /سفارش جدید[\s\S]*MN-1001[\s\S]*عکس \+ ریلز[\s\S]*الهیه/);
+  assert.ok(buttons(note.body).includes('o:o_test123:scheduled'));
+  c = await tap('o:o_test123:scheduled', note.body.text);
+  assert.match(c.find((x) => x.method === 'editMessageText').body.text, /زمان‌بندی شد/);
+  assert.equal((await loadPlatform({ maxAge: 0 })).orders.o_test123.status, 'scheduled');
+
   // Wrong webhook secret is rejected
   const r = await bots.handleUpdate('telegram', 'wrong', 'wrong', { update_id: upd++, message: { chat: { id: CHAT, type: 'private' }, text: '/files' } });
   assert.equal(r.status, 404);
