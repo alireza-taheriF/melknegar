@@ -8,7 +8,7 @@ export function secretSheet(title, login, pw, note) {
     h('div', { class: 'alert warn' }, icon('key'), h('div', { class: 'small' }, note || 'این رمز فقط یک بار نمایش داده می‌شود. آن را برای کاربر بفرستید؛ در اولین ورود باید رمز شخصی بگذارد.')),
     h('div', { class: 'field' }, h('label', null, 'نام کاربری / موبایل'), h('div', { class: 'secret-box' }, login)),
     h('div', { class: 'field' }, h('label', null, 'رمز موقت'), h('div', { class: 'secret-box' }, pw)),
-    h('button', { class: 'btn ghost block', on: { click: () => copyText(`ورود به ملک‌نگار\n${location.origin}\nنام کاربری: ${login}\nرمز موقت: ${pw}`) } }, icon('copy'), 'کپی اطلاعات ورود'),
+    h('button', { class: 'btn ghost block', on: { click: () => copyText(`ورود به پلاک‌نگار\n${location.origin}\nنام کاربری: ${login}\nرمز موقت: ${pw}`) } }, icon('copy'), 'کپی اطلاعات ورود'),
     h('button', { class: 'btn primary block', on: { click: close } }, 'متوجه شدم')));
 }
 
@@ -43,7 +43,7 @@ route('/settings', async () => {
       h('div', { class: 'section' }, h('h2', null, 'نصب اپ روی گوشی')),
       h('div', { class: 'card pad stack' },
         state.installPrompt
-          ? h('button', { class: 'btn accent block', on: { click: () => { state.installPrompt.prompt(); state.installPrompt = null; } } }, icon('download'), 'نصب ملک‌نگار')
+          ? h('button', { class: 'btn accent block', on: { click: () => { state.installPrompt.prompt(); state.installPrompt = null; } } }, icon('download'), 'نصب پلاک‌نگار')
           : h('div', { class: 'small text-2' }, 'اندروید (کروم): منوی سه‌نقطه ← «افزودن به صفحه اصلی» یا «نصب برنامه».', h('br'), 'آیفون (سافاری): دکمه اشتراک‌گذاری ← ', h('span', { class: 'ltr' }, 'Add to Home Screen'))),
     ] : null,
 
@@ -60,7 +60,7 @@ route('/settings', async () => {
       } } }, h('div', { class: 'grow strong small' }, 'خروج از همه دستگاه‌ها'), icon('chevron'))),
 
     h('button', { class: 'btn danger block', on: { click: async () => { await api('POST', '/api/auth/logout').catch(() => {}); state.user = null; state.ledger = null; go('/login'); } } }, icon('logout'), 'خروج از حساب'),
-    h('div', { class: 'center tiny muted' }, 'ملک‌نگار، نسخه ۱.۰'));
+    h('div', { class: 'center tiny muted' }, 'پلاک‌نگار، نسخه ۱.۰'));
   return layout({ title: 'تنظیمات', content, backTo: '/', active: '/settings' });
 });
 

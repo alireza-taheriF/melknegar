@@ -8,7 +8,7 @@ route('/login', () => {
   }
   const idInput = h('input', { class: 'input', name: 'username', autocomplete: 'username', inputmode: 'text', placeholder: 'موبایل یا نام کاربری', required: true, dir: 'auto' });
   const pwInput = h('input', { class: 'input', name: 'password', type: 'password', autocomplete: 'current-password', placeholder: 'رمز عبور', required: true, dir: 'ltr' });
-  const btn = h('button', { class: 'btn primary lg block', type: 'submit' }, 'ورود به ملک‌نگار');
+  const btn = h('button', { class: 'btn primary lg block', type: 'submit' }, 'ورود به پلاک‌نگار');
   const err = h('div', { class: 'alert danger', hidden: true });
   const show = h('button', { type: 'button', class: 'icon-btn plain', 'aria-label': 'نمایش رمز', on: { click: () => (pwInput.type = pwInput.type === 'password' ? 'text' : 'password') } }, icon('eye'));
 
@@ -43,19 +43,19 @@ route('/login', () => {
 
   return h('div', { class: 'auth' },
     h('section', { class: 'auth-art' },
-      h('img', { src: '/img/wordmark-light.png', alt: 'ملک‌نگار', style: { height: '46px', width: 'auto', position: 'relative' } }),
+      h('img', { src: '/img/wordmark-light.png', alt: 'پلاک‌نگار', style: { height: '46px', width: 'auto', position: 'relative' } }),
       h('div', null,
         h('h2', null, 'دفتر املاکی‌تان، این بار هوشمند.'),
         h('p', null, 'فایل‌ها و مشتری‌ها یک‌جا، جستجو در یک ثانیه، ثبت با پیام صوتی و عکس از دفتر قدیمی.'),
         h('div', { class: 'points' },
-          point('mic', 'ثبت با صدا و پیام در بله و تلگرام', 'فایل را بگویید؛ ملک‌نگار خودش ثبتش می‌کند.'),
+          point('mic', 'ثبت با صدا و پیام در بله و تلگرام', 'فایل را بگویید؛ پلاک‌نگار خودش ثبتش می‌کند.'),
           point('camera', 'دیجیتال‌کردن دفترهای قدیمی', 'از صفحه دفتر عکس بگیرید؛ همه فایل‌ها استخراج می‌شود.'),
           point('target', 'تطبیق خودکار فایل و مشتری', 'برای هر خریدار، مناسب‌ترین فایل‌ها با درصد تطابق.'),
           point('video', 'تیم محتوا و بازدید فنی', 'عکاس، ریلز و مهندس بازدید، با یک سفارش.'))),
-      h('div', { class: 'small', style: { opacity: '0.55', position: 'relative' } }, '© ملک‌نگار')),
+      h('div', { class: 'small', style: { opacity: '0.55', position: 'relative' } }, '© پلاک‌نگار')),
     h('section', { class: 'auth-form' },
       h('img', { class: 'mark', src: '/img/mark.png', alt: '' }),
-      h('img', { class: 'logo', src: '/img/wordmark.png', alt: 'ملک‌نگار', style: { height: '44px' } }),
+      h('img', { class: 'logo', src: '/img/wordmark.png', alt: 'پلاک‌نگار', style: { height: '44px' } }),
       h('p', { class: 'center muted small', style: { margin: '4px 0 22px' } }, 'دفتر هوشمند املاکی'),
       h('div', { class: 'card pad' }, form),
       h('div', { class: 'alert info', style: { marginTop: '14px' } }, icon('bot'), h('div', { class: 'small' }, 'اگر حسابتان به ربات بله یا تلگرام وصل است، در ربات بنویسید «ورود» تا لینک ورود بگیرید.')),
@@ -98,7 +98,7 @@ route('/password', () => {
 
   return h('div', { class: 'auth' }, h('section', { class: 'auth-art' }),
     h('section', { class: 'auth-form' },
-      h('img', { class: 'logo', src: '/img/wordmark.png', alt: 'ملک‌نگار', style: { height: '40px' } }),
+      h('img', { class: 'logo', src: '/img/wordmark.png', alt: 'پلاک‌نگار', style: { height: '40px' } }),
       h('h1', null, forced ? 'تعیین رمز عبور شخصی' : 'تغییر رمز عبور'),
       h('p', { class: 'center muted small' }, state.user?.name || ''),
       h('div', { class: 'card pad' }, form),

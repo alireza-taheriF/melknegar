@@ -95,7 +95,7 @@ export function layout({ title, content, active, backTo, actions = [], brand = f
   const openCapture = () => import('./views/capture.js').then((m) => m.openCapture());
 
   const sidebar = h('aside', { class: 'sidebar' },
-    h('div', { class: 'logo' }, h('img', { src: '/img/wordmark-light.png', alt: 'ملک‌نگار' })),
+    h('div', { class: 'logo' }, h('img', { src: '/img/wordmark-light.png', alt: 'پلاک‌نگار' })),
     h('button', { class: 'btn accent block side-cta', on: { click: openCapture } }, icon('plus'), 'ثبت سریع فایل'),
     ...NAV.filter((n) => !n.fab).map((n) => h('button', { class: ['side-link', isActive(n.path) && 'active'], on: { click: () => go(n.path) } }, icon(n.icon), n.label)),
     h('button', { class: ['side-link', isActive('/settings') && 'active'], on: { click: () => go('/settings') } }, icon('settings'), 'تنظیمات'),
@@ -106,7 +106,7 @@ export function layout({ title, content, active, backTo, actions = [], brand = f
   const top = h('header', { class: 'topbar' },
     h('div', { class: 'container' },
       backTo ? h('button', { class: 'icon-btn plain', 'aria-label': 'بازگشت', on: { click: () => go(backTo) } }, icon('back')) : null,
-      brand ? h('img', { class: 'brand-mini', src: '/img/wordmark.png', alt: 'ملک‌نگار' }) : null,
+      brand ? h('img', { class: 'brand-mini', src: '/img/wordmark.png', alt: 'پلاک‌نگار' }) : null,
       h('h1', null, brand ? '' : title),
       ...actions,
       !backTo && state.user?.staff ? h('button', { class: 'icon-btn', 'aria-label': 'پنل مدیریت', on: { click: () => go('/admin') } }, icon('shield')) : null,

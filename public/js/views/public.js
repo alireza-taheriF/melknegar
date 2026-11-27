@@ -7,7 +7,7 @@ import { catalog, packagePicker } from './services.js';
 function publicShell(content, sub) {
   return h('div', null,
     h('header', { class: 'public-head' }, h('div', { class: 'container' },
-      h('img', { src: '/img/wordmark-light.png', alt: 'ملک‌نگار' }),
+      h('img', { src: '/img/wordmark-light.png', alt: 'پلاک‌نگار' }),
       state.user ? h('button', { class: 'btn glass sm', on: { click: () => go('/') } }, 'ورود به اپ') : h('button', { class: 'btn glass sm', on: { click: () => go('/login') } }, 'ورود املاکی‌ها')),
       sub ? h('div', { class: 'container', style: { marginTop: '18px' } }, sub) : null),
     h('main', { class: 'container public-body', style: { maxWidth: '760px' } }, content));

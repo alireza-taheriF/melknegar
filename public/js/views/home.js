@@ -105,7 +105,7 @@ route('/', async () => {
           h('div', { class: 'grow' }, h('div', { class: 'small strong' }, a.text), h('div', { class: 'tiny muted' }, [a.byName, ago(a.at)].filter(Boolean).join('، '))))))
       : h('div', { class: 'card empty' }, icon('inbox'), h('h3', null, 'هنوز فعالیتی ثبت نشده'), h('p', { class: 'small' }, 'اولین فایل را با دکمه + ثبت کنید.')),
   );
-  return layout({ title: 'ملک‌نگار', content, brand: true });
+  return layout({ title: 'پلاک‌نگار', content, brand: true });
 });
 
 export async function quickStatus(p, status, extra = {}) {

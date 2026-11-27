@@ -193,7 +193,7 @@ export function openCapture(initial = 'text') {
     draw();
     return h('div', null,
       h('h3', null, 'ثبت سریع'),
-      h('p', { class: 'small muted', style: { margin: '0' } }, 'فایل یا مشتری را هر طور راحت‌اید وارد کنید؛ ملک‌نگار مشخصات را جدا می‌کند.'),
+      h('p', { class: 'small muted', style: { margin: '0' } }, 'فایل یا مشتری را هر طور راحت‌اید وارد کنید؛ پلاک‌نگار مشخصات را جدا می‌کند.'),
       modes, body);
   }, { onClose: () => cleanup() });
 }

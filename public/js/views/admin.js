@@ -24,7 +24,7 @@ route('/admin', async () => {
   };
   drawTabs();
   draw();
-  return layout({ title: 'پنل مدیریت ملک‌نگار', content: h('div', null, tabs, body), active: '/admin', backTo: '/' });
+  return layout({ title: 'پنل مدیریت پلاک‌نگار', content: h('div', null, tabs, body), active: '/admin', backTo: '/' });
 }, { staff: true });
 
 function ordersTab(d, cat, tenantName) {
@@ -166,7 +166,7 @@ function botsTab(d) {
   };
   return h('div', { class: 'stack' },
     h('div', { class: 'alert info' }, icon('shield'), h('div', { class: 'small' }, 'توکن ربات رمزنگاری‌شده ذخیره می‌شود و دیگر نمایش داده نمی‌شود. وب‌هوک با کلید مخفی تصادفی محافظت می‌شود.')),
-    block('bale', 'ربات بله', 'در بله به @botfather پیام دهید، ربات بسازید (مثلاً melknegar_bot) و توکن را اینجا بچسبانید.'),
+    block('bale', 'ربات بله', 'در بله به @botfather پیام دهید، ربات بسازید (مثلاً pelaknegar_bot) و توکن را اینجا بچسبانید.'),
     block('telegram', 'ربات تلگرام', 'در تلگرام به @BotFather پیام دهید، /newbot بزنید و توکن را اینجا بچسبانید.'));
 }
 

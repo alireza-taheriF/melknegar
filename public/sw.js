@@ -1,5 +1,5 @@
 // Service worker: caches the app shell only. API responses (private data) are never cached.
-const VERSION = 'mn-v1-__BUILD__';
+const VERSION = 'pn-v2';
 const SHELL = ['/', '/index.html', '/css/app.css', '/js/app.js', '/js/core.js', '/js/labels.js',
   '/js/views/auth.js', '/js/views/home.js', '/js/views/properties.js', '/js/views/clients.js', '/js/views/capture.js',
   '/js/views/services.js', '/js/views/settings.js', '/js/views/admin.js', '/js/views/public.js',
