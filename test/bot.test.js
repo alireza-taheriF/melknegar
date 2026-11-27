@@ -12,6 +12,7 @@ process.env.APP_URL = 'https://app.test';
 process.env.AI_DISABLED = '1';
 process.env.SEED_DATA = execFileSync('node', ['scripts/make_seed.js', JSON.stringify({ tenant: { name: 'املاک تست' }, demo: true, users: [
   { name: 'علی', username: 'ali', phone: '09358595056', staff: 'superadmin', role: 'owner', password: 'Sup3r-secret-pw' },
+  { name: 'مشاور دمو', username: 'demo', role: 'owner', password: 'Demo-pass-1405' },
 ] })]).toString();
 
 // Fake messenger: records every call, answers like the Bot API.
@@ -38,14 +39,14 @@ const CHAT = 5550001;
 async function secret() {
   return (await loadPlatform({ maxAge: 0 })).bots.telegram.secret;
 }
-async function say(text, extra = {}) {
+async function say(text, extra = {}, chat = CHAT, from = undefined) {
   calls.length = 0;
-  await bots.handleUpdate('telegram', await secret(), await secret(), { update_id: upd++, message: { message_id: ++msgId, chat: { id: CHAT, type: 'private' }, text, ...extra } });
+  await bots.handleUpdate('telegram', await secret(), await secret(), { update_id: upd++, message: { message_id: ++msgId, chat: { id: chat, type: 'private' }, from, text, ...extra } });
   return calls.filter((c) => c.method === 'sendMessage').map((c) => c.body);
 }
-async function tap(data, messageText = '') {
+async function tap(data, messageText = '', chat = CHAT) {
   calls.length = 0;
-  await bots.handleUpdate('telegram', await secret(), await secret(), { update_id: upd++, callback_query: { id: 'cq' + upd, data, message: { message_id: 77, text: messageText, chat: { id: CHAT, type: 'private' } } } });
+  await bots.handleUpdate('telegram', await secret(), await secret(), { update_id: upd++, callback_query: { id: 'cq' + upd, data, message: { message_id: 77, text: messageText, chat: { id: chat, type: 'private' } } } });
   return calls;
 }
 const buttons = (m) => (m.reply_markup?.inline_keyboard || []).flat().map((b) => b.callback_data || b.url);
@@ -62,7 +63,7 @@ test('bot: link, menu, capture, card actions, edit, search, lists', async () => 
 
   // Link the chat
   const users = await loadUsers({ maxAge: 0 });
-  const ali = Object.values(users.users).find((u) => u.username === 'ali');
+  const ali = Object.values(users.users).find((u) => u.username === 'demo');
   const { token } = await bots.createLinkToken(ali.id);
   out = await say('/start ' + token);
   assert.match(out[0].text, /وصل شد/);
@@ -157,18 +158,40 @@ test('bot: link, menu, capture, card actions, edit, search, lists', async () => 
   assert.match(calls.find((x) => x.method === 'answerCallbackQuery').body.text, /وصل نیست/);
   assert.ok(!calls.some((x) => x.method === 'editMessageText'));
 
-  // New order -> admin is notified with status buttons, and can move it forward
+  // New order -> @alittaherii (listed recipient, not a linked account) and the
+  // linked superadmin are notified; both can move the order forward.
+  const ADMIN_CHAT = 7770001, ALI_CHAT = 8880001;
   const { mutatePlatform } = await import('../lib/data.js');
+  await mutatePlatform((p) => { p.notify = { usernames: ['alittaherii'], chats: {} }; });
+  out = await say('/start', {}, ADMIN_CHAT, { username: 'AliTTaherii' });
+  assert.match(out[0].text, /اعلان‌های پلاک‌نگار برای شما فعال شد/);
+  assert.equal(out.length, 1, 'no "not linked" message after activation');
+  const staff = Object.values((await loadUsers({ maxAge: 0 })).users).find((u) => u.username === 'ali');
+  const st = await bots.createLinkToken(staff.id);
+  out = await say('/start ' + st.token, {}, ALI_CHAT);
+  assert.match(out[0].text, /حساب مدیریت/);
+  out = await say('📦 سفارش‌های باز', {}, ALI_CHAT);
+  assert.match(out[0].text, /سفارش بازی نیست/);
+  // a staff account has no agency ledger in the bot
+  out = await say('🏠 فایل‌ها', {}, ALI_CHAT);
+  assert.doesNotMatch(out[0].text, /فایل‌ها — فعال/);
+
   const order = { id: 'o_test123', code: 'MN-1001', kind: 'content', package: 'reels', estimate: 3200000, agency: 'املاک تست', source: 'app', status: 'new', contact: { name: 'کریمی', phone: '09121112233' }, location: { city: 'مشهد', neighborhood: 'الهیه', address: 'الهیه ۱۲' }, details: { area: 120, preferredAt: 'شنبه صبح' }, history: [] };
   await mutatePlatform((p) => { p.orders[order.id] = order; });
   calls.length = 0;
   await bots.notifyNewOrder(order);
-  const note = calls.find((x) => x.method === 'sendMessage');
-  assert.equal(note.body.chat_id, String(CHAT));
-  assert.match(note.body.text, /سفارش جدید[\s\S]*MN-1001[\s\S]*عکس \+ ریلز[\s\S]*الهیه/);
+  const notes = calls.filter((x) => x.method === 'sendMessage');
+  assert.deepEqual(notes.map((n) => n.body.chat_id).sort(), [String(ADMIN_CHAT), String(ALI_CHAT)].sort());
+  assert.ok(!notes.some((n) => n.body.chat_id === String(CHAT)), 'agency user is not notified');
+  const note = notes[0];
+  assert.match(note.body.text, /سفارش جدید[\s\S]*MN-1001[\s\S]*عکس \+ ریلز[\s\S]*۳٫۲ میلیون[\s\S]*املاک تست[\s\S]*کریمی — 09121112233[\s\S]*الهیه/);
   assert.ok(buttons(note.body).includes('o:o_test123:scheduled'));
-  c = await tap('o:o_test123:scheduled', note.body.text);
+  c = await tap('o:o_test123:scheduled', note.body.text, ADMIN_CHAT);
   assert.match(c.find((x) => x.method === 'editMessageText').body.text, /زمان‌بندی شد/);
+  assert.equal((await loadPlatform({ maxAge: 0 })).orders.o_test123.status, 'scheduled');
+  // an agency user cannot press order buttons
+  c = await tap('o:o_test123:canceled', '', CHAT);
+  assert.match(c.find((x) => x.method === 'answerCallbackQuery').body.text, /فقط مدیران/);
   assert.equal((await loadPlatform({ maxAge: 0 })).orders.o_test123.status, 'scheduled');
 
   // Wrong webhook secret is rejected

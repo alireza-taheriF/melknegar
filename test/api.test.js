@@ -11,6 +11,7 @@ const BASE = `http://localhost:${PORT}`;
 const seed = execFileSync('node', ['scripts/make_seed.js', JSON.stringify({ tenant: { name: 'املاک تست' }, demo: true, users: [
   { name: 'علی', username: 'ali', phone: '09358595056', staff: 'superadmin', role: 'owner', password: 'Sup3r-secret-pw' },
   { name: 'شریک', username: 'partner', staff: 'admin', role: 'owner', password: 'Temp-pass-123', mustChange: true },
+  { name: 'مشاور دمو', username: 'demo', role: 'owner', password: 'Demo-pass-1405' },
 ] })]).toString();
 let srv;
 test.before(async () => {
@@ -37,6 +38,17 @@ test('auth, ledger, capture, services, admin', async () => {
   const login = await a('POST', '/api/auth/login', { identifier: '۰۹۳۵۸۵۹۵۰۵۶', password: 'Sup3r-secret-pw' });
   assert.equal(login.status, 200, JSON.stringify(login.json));
   assert.equal(login.json.user.staff, 'superadmin');
+  // platform staff do not belong to any agency: no ledger, no agency orders
+  assert.equal((await a('GET', '/api/auth/me')).json.user.tenantId, null);
+  assert.equal((await a('GET', '/api/ledger')).status, 403);
+  assert.equal((await a('GET', '/api/services/orders')).status, 403);
+  const admin = a;
+
+  // the demo agency owner works with the ledger
+  const d = client();
+  assert.equal((await d('POST', '/api/auth/login', { identifier: 'demo', password: 'Demo-pass-1405' })).status, 200);
+  {
+  const a = d;
   const led = await a('GET', '/api/ledger');
   assert.equal(led.status, 200);
   assert.ok(led.json.properties.length >= 8);
@@ -76,6 +88,8 @@ test('auth, ledger, capture, services, admin', async () => {
   assert.equal(ord.status, 200, JSON.stringify(ord.json));
   assert.match(ord.json.order.code, /^MN-\d+$/);
 
+  }
+  const pid = (await d('GET', '/api/ledger')).json.properties.find((x) => x.status === 'sold').id;
   // public inspection request + tracking
   const pub = client();
   const tooFast = await pub('POST', '/api/public/orders', { kind: 'inspection', name: 'سارا', phone: '09121234567', address: 'سجاد', startedAt: Date.now() });
@@ -87,6 +101,27 @@ test('auth, ledger, capture, services, admin', async () => {
   assert.equal((await pub('GET', `/api/public/track?code=${po.json.order.code}&phone=09120000000`)).status, 404);
   assert.equal((await pub('GET', '/api/ledger')).status, 401);
   assert.equal((await pub('GET', '/api/admin/overview')).status, 401);
+
+  // self-signup: a brand-new agency sees nothing from any other agency
+  const sg = client();
+  assert.equal((await sg('POST', '/api/auth/signup', { agency: 'املاک نو', name: 'رضا نوری', phone: '09157778899', password: 'Noori-pass-1405', startedAt: Date.now() })).status, 400); // too fast
+  const su = await sg('POST', '/api/auth/signup', { agency: 'املاک نو', name: 'رضا نوری', phone: '09157778899', city: 'مشهد', password: 'Noori-pass-1405', startedAt: Date.now() - 20000 });
+  assert.equal(su.status, 200, JSON.stringify(su.json));
+  assert.equal(su.json.user.role, 'owner');
+  assert.ok(su.json.user.tenantId);
+  assert.equal((await client()('POST', '/api/auth/signup', { agency: 'x', name: 'تکراری', phone: '09157778899', password: 'Another-pass-1', startedAt: Date.now() - 20000 })).status, 400); // phone taken
+  const sl = await sg('GET', '/api/ledger');
+  assert.equal(sl.status, 200);
+  assert.equal(sl.json.properties.length, 0);
+  assert.equal(sl.json.clients.length, 0);
+  assert.equal((await sg('GET', '/api/services/orders')).json.orders.length, 0);
+  assert.equal((await sg('PATCH', '/api/properties/' + pid, { status: 'active' })).status, 404);
+  assert.equal((await sg('GET', '/api/admin/overview')).status, 403);
+  const so = await sg('POST', '/api/services/orders', { kind: 'inspection', package: 'small', address: 'سجاد ۵' });
+  assert.equal(so.status, 200);
+  // and the demo agency does not see the new agency's order
+  assert.ok(!(await d('GET', '/api/services/orders')).json.orders.some((o) => o.id === so.json.order.id));
+  assert.equal((await d('GET', '/api/services/orders')).json.orders.length, 1);
 
   // admin: create agency, its owner must change password, isolation between tenants
   const ov = await a('GET', '/api/admin/overview');

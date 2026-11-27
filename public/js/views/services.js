@@ -35,15 +35,15 @@ function orderCard(o, cat) {
 
 route('/services', async () => {
   const [cat, orders] = await Promise.all([catalog(), api('GET', '/api/services/orders')]);
-  const card = (kind, ic, bg, color) => h('button', { class: 'card service-card', style: { width: '100%', textAlign: 'start' }, on: { click: () => go('/services/new?kind=' + kind) } },
-    h('div', { class: 'ico', style: { background: bg, color } }, icon(ic)),
+  const card = (kind, ic) => h('button', { class: 'card service-card', style: { width: '100%', textAlign: 'start' }, on: { click: () => go('/services/new?kind=' + kind) } },
+    h('div', { class: 'ico i-' + kind }, icon(ic)),
     h('div', { class: 'grow' }, h('h3', null, cat[kind].title), h('div', { class: 'small muted' }, cat[kind].subtitle),
-      h('div', { class: 'small strong', style: { marginTop: '6px', color: 'var(--navy-800)' } }, 'از ' + money(Math.min(...cat[kind].packages.map((p) => p.price))))),
+      h('div', { class: 'small strong', style: { marginTop: '6px', color: 'var(--tint)' } }, 'از ' + money(Math.min(...cat[kind].packages.map((p) => p.price))))),
     icon('chevron'));
   const content = h('div', null,
     h('div', { class: 'stack' },
-      card('content', 'video', 'linear-gradient(135deg,#e7f0fb,#d6e6f8)', 'var(--blue-600)'),
-      card('inspection', 'shield', 'linear-gradient(135deg,#e6f6f5,#d2efed)', 'var(--teal-500)')),
+      card('content', 'video'),
+      card('inspection', 'shield')),
     h('div', { class: 'card pad', style: { marginTop: '12px' } },
       h('div', { class: 'row' }, icon('link'), h('div', { class: 'grow small' }, h('div', { class: 'strong' }, 'لینک درخواست بازدید فنی برای خریداران شما'), h('div', { class: 'muted tiny' }, 'این لینک را برای خریدارها بفرستید تا مستقیم درخواست بازدید فنی ثبت کنند.')),
         h('button', { class: 'btn sm ghost', on: { click: () => navigator.clipboard.writeText(location.origin + '/#/inspect').then(() => toast('لینک کپی شد')) } }, icon('copy'), 'کپی'))),

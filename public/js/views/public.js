@@ -8,7 +8,7 @@ function publicShell(content, sub) {
   return h('div', null,
     h('header', { class: 'public-head' }, h('div', { class: 'container' },
       h('img', { src: '/img/wordmark-light.png', alt: 'پلاک‌نگار' }),
-      state.user ? h('button', { class: 'btn glass sm', on: { click: () => go('/') } }, 'ورود به اپ') : h('button', { class: 'btn glass sm', on: { click: () => go('/login') } }, 'ورود املاکی‌ها')),
+      state.user ? h('button', { class: 'btn sm', style: { background: 'rgba(255,255,255,.14)', color: '#fff' }, on: { click: () => go('/') } }, 'ورود به اپ') : h('button', { class: 'btn sm', style: { background: 'rgba(255,255,255,.14)', color: '#fff' }, on: { click: () => go('/login') } }, 'ورود املاکی‌ها')),
       sub ? h('div', { class: 'container', style: { marginTop: '18px' } }, sub) : null),
     h('main', { class: 'container public-body', style: { maxWidth: '760px' } }, content));
 }
@@ -65,9 +65,9 @@ route('/inspect', async ({ query }) => {
     : [['calendar', 'هماهنگی', 'زمان مناسب نور و حضور در ملک تنظیم می‌شود.'], ['camera', 'عکاسی و فیلم‌برداری', 'تیم حرفه‌ای با تجهیزات کامل.'], ['video', 'تحویل', 'عکس‌ها و ریلز آماده انتشار.']];
   const intro = h('div', null,
     h('h1', { style: { margin: '0 0 6px', fontSize: '24px', fontWeight: '850' } }, kind === 'inspection' ? 'قبل از خرید خانه، یک مهندس ببیندش' : def.title),
-    h('p', { style: { margin: '0', color: 'rgba(255,255,255,.78)', maxWidth: '560px' } }, def.subtitle));
+    h('p', { class: 'sub', style: { margin: '0', maxWidth: '560px' } }, def.subtitle));
   return publicShell(h('div', { class: 'stack' },
-    h('div', { class: 'card pad' }, h('div', { class: 'grid3', style: { gap: '14px' } }, steps.map(([ic, t, d]) => h('div', { class: 'stack', style: { gap: '4px' } }, h('div', { class: 'row', style: { gap: '8px', color: 'var(--teal-500)' } }, icon(ic), h('span', { class: 'strong', style: { color: 'var(--text)' } }, t)), h('div', { class: 'small muted' }, d))))),
+    h('div', { class: 'card pad' }, h('div', { class: 'grid3', style: { gap: '14px' } }, steps.map(([ic, t, d]) => h('div', { class: 'stack', style: { gap: '4px' } }, h('div', { class: 'row', style: { gap: '8px', color: 'var(--tint)' } }, icon(ic), h('span', { class: 'strong', style: { color: 'var(--text)' } }, t)), h('div', { class: 'small muted' }, d))))),
     def.note ? h('div', { class: 'alert info' }, icon('info'), h('div', { class: 'small' }, def.note)) : null,
     box,
     h('div', { class: 'center' }, h('button', { class: 'btn ghost', on: { click: () => go('/track') } }, icon('search'), 'پیگیری درخواست قبلی'))), intro);

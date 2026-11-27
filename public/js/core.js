@@ -276,3 +276,11 @@ export function initials(name) {
   const parts = String(name || '').replace(/^(آقای|خانم)\s+/, '').trim().split(/\s+/);
   return (parts[0]?.[0] || '؟') + (parts[1]?.[0] ? '‌' + parts[1][0] : '');
 }
+
+// Theme-aware wordmark: dark navy text on light, white text on dark.
+export function wordmark(props = {}) {
+  const { class: cls = '', style } = props;
+  return h('span', { class: ['wordmark', cls], style: { display: 'contents' } },
+    h('img', { class: 'only-light', src: '/img/wordmark.png', alt: 'پلاک‌نگار', style }),
+    h('img', { class: 'only-dark', src: '/img/wordmark-light.png', alt: 'پلاک‌نگار', style }));
+}

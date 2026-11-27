@@ -60,6 +60,7 @@ save_png(light_version(w), 'public/img/wordmark-light.png', colors=64)
 # Mark: shown at <=96px CSS -> 288px is enough for 3x.
 m = mark.copy(); m.thumbnail((288, 288), Image.LANCZOS)
 save_png(m, 'public/img/mark.png', colors=128)
+save_png(light_version(m), 'public/img/mark-light.png', colors=128)
 
 
 def icon(size, pad, bg=(255, 255, 255, 255)):

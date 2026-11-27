@@ -5,23 +5,37 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <title>پلاک‌نگار — دفتر هوشمند املاکی</title>
   <meta name="description" content="پلاک‌نگار: فایل‌ها و مشتری‌های املاکی در یک‌جا، ثبت با صدا و عکس، تطبیق خودکار، تولید محتوا و بازدید فنی ملک.">
-  <meta name="theme-color" content="#0b2147">
+  <meta name="theme-color" content="#f2f2f7">
+  <meta name="color-scheme" content="light dark">
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
   <meta name="apple-mobile-web-app-title" content="پلاک‌نگار">
   <meta name="referrer" content="no-referrer">
   <link rel="manifest" href="/manifest.webmanifest">
   <link rel="icon" type="image/png" href="/icons/favicon-64.png">
   <link rel="apple-touch-icon" href="/icons/apple-touch-icon.png">
   <link rel="preload" href="/fonts/Vazirmatn.woff2" as="font" type="font/woff2" crossorigin>
+  <script src="/js/theme.js"></script>
   <link rel="stylesheet" href="/css/app.css">
+  <link rel="modulepreload" href="/js/app.js">
+  <link rel="modulepreload" href="/js/core.js">
+  <link rel="modulepreload" href="/js/labels.js">
+  <link rel="modulepreload" href="/js/views/auth.js">
+  <link rel="modulepreload" href="/js/views/home.js">
+  <link rel="modulepreload" href="/js/views/properties.js">
+  <link rel="modulepreload" href="/js/views/clients.js">
+  <link rel="modulepreload" href="/js/views/services.js">
+  <link rel="modulepreload" href="/js/views/settings.js">
+  <link rel="modulepreload" href="/js/views/admin.js">
+  <link rel="modulepreload" href="/js/views/public.js">
   <script type="module" src="/js/app.js"></script>
 </head>
 <body>
   <div id="app">
     <div class="loading-block boot">
-      <img src="/img/mark.png" alt="" width="72" height="64">
+      <img class="only-light" src="/img/mark.png" alt="" width="72" height="64">
+      <img class="only-dark" src="/img/mark-light.png" alt="" width="72" height="64">
       <div class="spinner"></div>
     </div>
   </div>

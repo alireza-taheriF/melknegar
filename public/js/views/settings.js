@@ -22,7 +22,7 @@ route('/settings', async () => {
   const botRow = (platform, label, linked) => {
     const conf = state.bots?.[platform];
     return h('div', { class: 'row', style: { padding: '13px 14px' } },
-      h('div', { class: 'avatar sm', style: { background: platform === 'telegram' ? 'linear-gradient(135deg,#2aa3df,#1c84c6)' : 'linear-gradient(135deg,#3fc28c,#1d9c6b)' } }, icon('send')),
+      h('div', { class: 'avatar sm bot-avatar ' + platform }, icon('send')),
       h('div', { class: 'grow' }, h('div', { class: 'strong small' }, label), h('div', { class: 'tiny muted' }, !conf?.connected ? 'ربات هنوز توسط مدیر پلتفرم راه‌اندازی نشده' : linked ? 'متصل است — پیام، صدا و عکس بفرستید' : '@' + conf.username)),
       linked
         ? h('button', { class: 'btn sm ghost', on: { click: async () => { if (!(await confirmDialog('قطع اتصال ربات', `اتصال ${label} از حساب شما قطع شود؟`))) return; await api('POST', '/api/bot-unlink', { platform }).catch(errorToast); render(); } } }, 'قطع')
@@ -34,6 +34,9 @@ route('/settings', async () => {
     h('div', { class: 'card owner-card' },
       h('div', { class: 'avatar' }, initials(u.name)),
       h('div', { class: 'grow' }, h('div', { class: 'strong' }, u.name), h('div', { class: 'small muted' }, [u.staff ? STAFF[u.staff] : ROLE[u.role], u.tenantName].filter(Boolean).join('، ')), h('div', { class: 'tiny muted ltr', style: { textAlign: 'right' } }, fa(u.phone || u.username)))),
+
+    h('div', { class: 'section' }, h('h2', null, 'ظاهر')),
+    themePicker(),
 
     h('div', { class: 'section' }, h('h2', null, 'اتصال ربات بله و تلگرام')),
     h('div', { class: 'list' }, botRow('bale', 'ربات بله', u.bale), botRow('telegram', 'ربات تلگرام', u.telegram)),
@@ -61,8 +64,19 @@ route('/settings', async () => {
 
     h('button', { class: 'btn danger block', on: { click: async () => { await api('POST', '/api/auth/logout').catch(() => {}); state.user = null; state.ledger = null; go('/login'); } } }, icon('logout'), 'خروج از حساب'),
     h('div', { class: 'center tiny muted' }, 'پلاک‌نگار، نسخه ۱.۰'));
-  return layout({ title: 'تنظیمات', content, backTo: '/', active: '/settings' });
+  return layout({ title: 'تنظیمات', content, backTo: u.staff && !u.tenantId ? null : '/', active: '/settings' });
 });
+
+function themePicker() {
+  const opts = [['auto', 'خودکار'], ['light', 'روشن'], ['dark', 'تیره']];
+  const seg = h('div', { class: 'seg', role: 'radiogroup', 'aria-label': 'ظاهر برنامه' });
+  const draw = () => {
+    const cur = window.pnTheme?.get() || 'auto';
+    seg.replaceChildren(...opts.map(([k, label]) => h('button', { type: 'button', role: 'radio', 'aria-checked': String(cur === k), class: cur === k ? 'on' : '', on: { click: () => { window.pnTheme?.set(k); draw(); } } }, label)));
+  };
+  draw();
+  return h('div', { class: 'card pad stack', style: { gap: '8px' } }, seg, h('div', { class: 'tiny muted' }, 'در حالت «خودکار» ظاهر برنامه همراه تنظیم روشن/تیره گوشی یا کامپیوتر شما عوض می‌شود.'));
+}
 
 async function linkBot(platform, label, btn) {
   busy(btn, true);

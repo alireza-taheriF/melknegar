@@ -1,6 +1,6 @@
 // Platform staff panel: orders, agencies, users, bots, system status.
 import { h, icon, api, fa, money, date, dateTime, ago, toast, errorToast, sheet, busy, confirmDialog, parseNumber, faInt } from '../core.js';
-import { route, layout, state, go, render } from '../app.js';
+import { route, layout, state, go, render, isPlatformOnly } from '../app.js';
 import { ORDER_STATUS, ROLE, STAFF } from '../labels.js';
 import { catalog } from './services.js';
 import { secretSheet } from './settings.js';
@@ -24,7 +24,7 @@ route('/admin', async () => {
   };
   drawTabs();
   draw();
-  return layout({ title: 'پنل مدیریت پلاک‌نگار', content: h('div', null, tabs, body), active: '/admin', backTo: '/' });
+  return layout({ title: 'پنل مدیریت پلاک‌نگار', content: h('div', null, tabs, body), active: '/admin', backTo: isPlatformOnly() ? null : '/' });
 }, { staff: true });
 
 function ordersTab(d, cat, tenantName) {
@@ -174,9 +174,36 @@ function botsTab(d) {
         : [h('div', { class: 'small muted' }, howto), h('div', { class: 'row' }, token, btn)]);
   };
   return h('div', { class: 'stack' },
+    notifyCard(d),
     h('div', { class: 'alert info' }, icon('shield'), h('div', { class: 'small' }, 'توکن ربات رمزنگاری‌شده ذخیره می‌شود و دیگر نمایش داده نمی‌شود. وب‌هوک با کلید مخفی تصادفی محافظت می‌شود.')),
     block('bale', 'ربات بله', 'در بله به @botfather پیام دهید، ربات بسازید (مثلاً pelaknegar_bot) و توکن را اینجا بچسبانید.'),
     block('telegram', 'ربات تلگرام', 'در تلگرام به @BotFather پیام دهید، /newbot بزنید و توکن را اینجا بچسبانید.'));
+}
+
+// Who gets new orders and agency signups in Telegram/Bale.
+function notifyCard(d) {
+  const list = d.notify || [];
+  const input = h('input', { class: 'input ltr', placeholder: '@alittaherii, @username', value: list.map((x) => '@' + x.username).join(', '), autocomplete: 'off', dir: 'ltr' });
+  const save = h('button', { class: 'btn primary' }, 'ذخیره');
+  save.addEventListener('click', async () => {
+    busy(save, true);
+    try {
+      await api('PUT', '/api/admin/notify', { usernames: input.value });
+      toast('دریافت‌کنندگان ذخیره شد');
+      render();
+    } catch (e) { errorToast(e); busy(save, false); }
+  });
+  const bot = d.bots?.telegram?.username;
+  return h('div', { class: 'card pad stack' },
+    h('div', { class: 'strong' }, 'دریافت اعلان سفارش‌ها و ثبت‌نام‌ها'),
+    h('div', { class: 'small muted' }, 'آیدی تلگرام (یا بله) افرادی که باید هر سفارش عکاسی، تولید محتوا یا بازدید فنی و هر ثبت‌نام املاکی جدید را دریافت کنند. هر نفر فقط یک بار باید به ربات پیام بدهد (مثلاً /start) تا اعلان‌ها برایش فعال شود.' + (bot ? ` ربات: @${bot}` : '')),
+    h('div', { class: 'row' }, input, save),
+    list.length ? h('div', { class: 'list' }, list.map((x) => h('div', { class: 'row spread', style: { padding: '10px 14px' } },
+      h('span', { class: 'ltr strong small' }, '@' + x.username),
+      x.telegram || x.bale
+        ? h('span', { class: 'badge b-active' }, icon('check'), 'فعال' + (x.telegram && x.bale ? ' (تلگرام و بله)' : x.telegram ? ' (تلگرام)' : ' (بله)'))
+        : h('span', { class: 'badge b-unknown' }, 'منتظر پیام به ربات')))) : null,
+    h('div', { class: 'tiny muted' }, 'مدیرانی که حسابشان را از تنظیمات به ربات وصل کرده‌اند هم خودکار اعلان می‌گیرند.'));
 }
 
 function systemTab(d) {
