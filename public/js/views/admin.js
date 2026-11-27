@@ -110,6 +110,15 @@ function tenantsTab(d) {
       return h('div', { class: 'row', style: { padding: '12px 14px' } },
         h('div', { class: 'avatar sm' }, t.name.slice(0, 1)),
         h('div', { class: 'grow' }, h('div', { class: 'strong small' }, t.name, t.demo ? h('span', { class: 'badge b-new', style: { marginInlineStart: '6px' } }, 'دفتر دمو') : null), h('div', { class: 'tiny muted' }, `${t.city}، ${fa(members.length)} کاربر، ${date(t.createdAt)}${t.active ? '' : '، غیرفعال'}`)),
+        h('button', { class: 'btn sm ghost', 'aria-label': 'تغییر نام', on: { click: () => sheet((close) => {
+          const input = h('input', { class: 'input', value: t.name });
+          const save = h('button', { class: 'btn primary block' }, 'ذخیره');
+          save.addEventListener('click', async () => {
+            busy(save, true);
+            try { await api('PATCH', '/api/admin/tenants/' + t.id, { name: input.value }); toast('نام دفتر تغییر کرد'); close(); render(); } catch (e) { errorToast(e); busy(save, false); }
+          });
+          return h('div', { class: 'stack' }, h('h3', null, 'تغییر نام دفتر'), input, save);
+        }) } }, icon('edit')),
         t.demo ? null : h('button', { class: 'btn sm ghost', on: { click: async () => {
           if (!(await confirmDialog(t.active ? 'غیرفعال‌کردن دفتر' : 'فعال‌کردن دفتر', t.active ? 'کاربران این دفتر دیگر نمی‌توانند وارد شوند.' : 'کاربران این دفتر دوباره می‌توانند وارد شوند.', { danger: t.active }))) return;
           try { await api('PATCH', '/api/admin/tenants/' + t.id, { active: !t.active }); render(); } catch (e) { errorToast(e); }
