@@ -1,0 +1,15 @@
+{
+  "name": "melknegar",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "ملک‌نگار — دفتر هوشمند املاکی، تولید محتوا و بازدید فنی",
+  "engines": { "node": "22.x" },
+  "scripts": {
+    "dev": "node scripts/dev.js",
+    "test": "node --test test/"
+  },
+  "dependencies": {
+    "@vercel/blob": "*"
+  }
+}
