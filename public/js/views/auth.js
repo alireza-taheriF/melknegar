@@ -40,7 +40,7 @@ route('/login', () => {
     setTimeout(() => go(homeFor(state.user), { replace: true }));
     return h('div');
   }
-  const idInput = h('input', { class: 'input', name: 'username', autocomplete: 'username', inputmode: 'text', placeholder: 'مثلاً ۰۹۱۵۱۲۳۴۵۶۷', required: true, dir: 'auto' });
+  const idInput = h('input', { class: 'input', name: 'username', autocomplete: 'username', inputmode: 'text', placeholder: 'نام کاربری یا موبایل', required: true, dir: 'auto', autocapitalize: 'off', spellcheck: 'false' });
   const pwInput = h('input', { class: 'input', name: 'password', type: 'password', autocomplete: 'current-password', placeholder: 'رمز عبور', required: true, dir: 'ltr' });
   const btn = h('button', { class: 'btn primary lg block', type: 'submit' }, 'ورود');
   const err = h('div', { class: 'alert danger', hidden: true });
@@ -87,6 +87,7 @@ route('/signup', () => {
     agency: h('input', { class: 'input', name: 'organization', autocomplete: 'organization', placeholder: 'مثلاً املاک آرین', required: true, maxlength: 80 }),
     name: h('input', { class: 'input', name: 'name', autocomplete: 'name', placeholder: 'نام و نام خانوادگی مدیر', required: true, maxlength: 80 }),
     phone: h('input', { class: 'input ltr', name: 'tel', type: 'tel', autocomplete: 'tel', inputmode: 'tel', placeholder: '09151234567', required: true, dir: 'ltr' }),
+    username: h('input', { class: 'input ltr', name: 'username', autocomplete: 'username', autocapitalize: 'off', spellcheck: 'false', required: true, dir: 'ltr', maxlength: 32, placeholder: 'مثلاً arian_amlak' }),
     city: h('input', { class: 'input', name: 'city', autocomplete: 'address-level2', value: 'مشهد', maxlength: 40 }),
     password: h('input', { class: 'input', name: 'new-password', type: 'password', autocomplete: 'new-password', minlength: 8, required: true, dir: 'ltr', placeholder: 'حداقل ۸ کاراکتر' }),
     website: h('input', { name: 'website', tabindex: '-1', autocomplete: 'off', 'aria-hidden': 'true', style: { position: 'absolute', opacity: '0', height: '1px', width: '1px', pointerEvents: 'none', clipPath: 'inset(50%)' } }),
@@ -102,7 +103,7 @@ route('/signup', () => {
         busy(btn, true, 'در حال ساخت حساب...');
         try {
           await api('POST', '/api/auth/signup', {
-            agency: f.agency.value, name: f.name.value, phone: f.phone.value, city: f.city.value,
+            agency: f.agency.value, name: f.name.value, phone: f.phone.value, username: f.username.value.trim(), city: f.city.value,
             password: f.password.value, website: f.website.value, startedAt,
           });
           toast('حساب املاکی شما ساخته شد');
@@ -120,7 +121,8 @@ route('/signup', () => {
   h('div', { class: 'grid2' },
     h('div', { class: 'field' }, h('label', null, 'موبایل'), f.phone),
     h('div', { class: 'field' }, h('label', null, 'شهر'), f.city)),
-  h('div', { class: 'field' }, h('label', null, 'رمز عبور'), f.password, h('div', { class: 'hint' }, 'با همین موبایل و رمز وارد می‌شوید.')),
+  h('div', { class: 'field' }, h('label', null, 'نام کاربری'), f.username, h('div', { class: 'hint' }, 'انگلیسی، حداقل ۳ حرف. حروف، عدد، _ و . مجاز است.')),
+  h('div', { class: 'field' }, h('label', null, 'رمز عبور'), f.password, h('div', { class: 'hint' }, 'با نام کاربری یا موبایل و همین رمز وارد می‌شوید.')),
   f.website,
   err,
   btn,

@@ -104,12 +104,17 @@ test('auth, ledger, capture, services, admin', async () => {
 
   // self-signup: a brand-new agency sees nothing from any other agency
   const sg = client();
-  assert.equal((await sg('POST', '/api/auth/signup', { agency: 'املاک نو', name: 'رضا نوری', phone: '09157778899', password: 'Noori-pass-1405', startedAt: Date.now() })).status, 400); // too fast
-  const su = await sg('POST', '/api/auth/signup', { agency: 'املاک نو', name: 'رضا نوری', phone: '09157778899', city: 'مشهد', password: 'Noori-pass-1405', startedAt: Date.now() - 20000 });
+  assert.equal((await sg('POST', '/api/auth/signup', { agency: 'املاک نو', name: 'رضا نوری', phone: '09157778899', username: 'noori', password: 'Noori-pass-1405', startedAt: Date.now() })).status, 400); // too fast
+  const su = await sg('POST', '/api/auth/signup', { agency: 'املاک نو', name: 'رضا نوری', phone: '09157778899', username: 'noori', city: 'مشهد', password: 'Noori-pass-1405', startedAt: Date.now() - 20000 });
   assert.equal(su.status, 200, JSON.stringify(su.json));
   assert.equal(su.json.user.role, 'owner');
   assert.ok(su.json.user.tenantId);
-  assert.equal((await client()('POST', '/api/auth/signup', { agency: 'x', name: 'تکراری', phone: '09157778899', password: 'Another-pass-1', startedAt: Date.now() - 20000 })).status, 400); // phone taken
+  assert.equal((await client()('POST', '/api/auth/signup', { agency: 'x', name: 'تکراری', phone: '09157778899', username: 'another', password: 'Another-pass-1', startedAt: Date.now() - 20000 })).status, 400); // phone taken
+  assert.equal((await client()('POST', '/api/auth/signup', { agency: 'y', name: 'تکراری دو', phone: '09157778800', username: 'Noori', password: 'Another-pass-1', startedAt: Date.now() - 20000 })).status, 400); // username taken (case-insensitive)
+  assert.equal((await client()('POST', '/api/auth/signup', { agency: 'z', name: 'بی نام', phone: '09157778801', username: 'ab', password: 'Another-pass-1', startedAt: Date.now() - 20000 })).status, 400); // bad username
+  const byName = client();
+  assert.equal((await byName('POST', '/api/auth/login', { identifier: 'noori', password: 'Noori-pass-1405' })).status, 200); // logs in with the chosen username
+  assert.equal((await byName('GET', '/api/ledger')).json.properties.length, 0);
   const sl = await sg('GET', '/api/ledger');
   assert.equal(sl.status, 200);
   assert.equal(sl.json.properties.length, 0);
